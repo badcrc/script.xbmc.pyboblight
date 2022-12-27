@@ -28,7 +28,7 @@ __language__   = sys.modules[ "__main__" ].__language__
 __ID__   = sys.modules[ "__main__" ].__ID__
 
 from resources.lib.boblight import *
-from resources.lib.tools import log
+from resources.lib.tools import *
 
 bob = Boblight()
 
@@ -352,11 +352,12 @@ class settings():
     if (self.category == "static" and                 # only for 'static' category
             self.other_static_bg):                    # only if we want it displayed on static
 
-      bob.bob_set_priority(128)                       # allow lights to be turned on
-      rgb = (c_int * 3)(self.other_static_red,
-                        self.other_static_green,
-                        self.other_static_blue)
-      ret = bob.bob_set_static_color(byref(rgb))
+      bob.bob_set_priority(128)   # allow lights to be turned on
+      rgb = {}                    
+      rgb[0] = self.other_static_red
+      rgb[1] = self.other_static_green
+      rgb[2] = self.other_static_blue
+      bob.bob_set_static_color(rgb)
       self.staticBobActive = True
     else:
       bob.bob_set_priority(255)
@@ -381,7 +382,7 @@ class settings():
       saturation,value,speed,autospeed,interpolation,threshold = option[self.category]()
       for opt in OPTS:
         ret = bob.bob_setoption("%s    %s" % (opt,str(locals()[opt])))
-        log("changed %s    to %s ret:  %s" % (opt,str(locals()[opt]),ret))          
+        log("changed %s    to %s ret:  %s" % (opt,str(locals()[opt]),ret))   
       self.current_option = self.category
       self.force_update = False
   
@@ -414,12 +415,13 @@ class settings():
                                           # in 'handleStaticBgSettings()' if they are not needed
       if self.other_misc_initialflash:
         for i in range(len(BLING)):
-          rgb = (c_int * 3)(BLING[i][0],BLING[i][1],BLING[i][2])
-          bob.bob_set_static_color(byref(rgb))
+          #rgb = (c_int * 3)(BLING[i][0],BLING[i][1],BLING[i][2])
+          bob.bob_set_static_color(BLING[i])
           xbmc.sleep(1000)
       else:
-        rgb = (c_int * 3)(0,0,0)
-        bob.bob_set_static_color(byref(rgb))
+        #rgb = (c_int * 3)(0,0,0)
+        rgb=[0,0,0]
+        bob.bob_set_static_color(rgb)
       self.run_init = False
       xbmc.sleep(500)
     return True  

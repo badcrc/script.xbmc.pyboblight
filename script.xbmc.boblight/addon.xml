@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<addon id="script.xbmc.boblight" name="Kodi Boblight" version="2.0.20" provider-name="bobo1on1, Memphiz, wrtlprnft">
+<addon id="script.xbmc.pyboblight" name="Kodi Py-Boblight" version="2.0.20" provider-name="bobo1on1, Memphiz, wrtlprnft, badcrc">
   <requires>
     <import addon="xbmc.python" version="3.0.0"/>
   </requires>
@@ -32,6 +32,7 @@
     <description lang="nl_NL">Verbind Kodi output naar boblight backend.</description>
     <description lang="pl_PL">Podłącz wyjście Kodi do konsoli boblight.</description>
     <description lang="pt_PT">Ligar saída do Kodi à backend boblight.</description>
+    <!--
     <disclaimer lang="ca_ES">Necessites tindre el binari correcte perquè el complement funcioni</disclaimer>
     <disclaimer lang="de_DE">Du musst das korrekte Binary Addon installiert haben, damit diese Funktion unterstützt wird.</disclaimer>
     <disclaimer lang="el_GR">Χρειάζεται να έχετε εγκατεστημένο ένα κατάλληλο δυαδικό πρόσθετο για να δουλέψει.</disclaimer>
@@ -45,6 +46,7 @@
     <disclaimer lang="nl_NL">Je moet de juiste binaire add-on hebben geïnstalleerd voor dit om te werken.</disclaimer>
     <disclaimer lang="pl_PL">W celu poprawnego działania musisz mieć zainstalowaną odpowiednią bibliotekę dodatku.</disclaimer>
     <disclaimer lang="pt_PT">É necessário instalar o addon binário correcto para que isto funcione.</disclaimer>
+    -->
     <platform>all</platform>
     <license>GPL-3.0-or-later</license>
     <website>https://code.google.com/archive/p/boblight</website>

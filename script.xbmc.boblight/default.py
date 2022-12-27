@@ -88,6 +88,8 @@ class MyMonitor( xbmc.Monitor ):
 class Main():
   def __init__( self, *args, **kwargs ):
     self.warning   = 0
+    log('Main - init')
+
   
   def connectBoblight(self):
     bob.bob_set_priority(255)
@@ -96,7 +98,7 @@ class Main():
       log("connecting to local boblightd")
     else:
       log("connecting to boblightd %s:%s" % (settings.hostip, str(settings.hostport)))
-  
+
     ret = bob.bob_connect(settings.hostip, settings.hostport)
   
     if not ret:
@@ -116,26 +118,7 @@ class Main():
       bob.bob_set_priority(128)  
       return True
   
-  def startup(self):
-    platform = get_platform()
-    libpath  = get_libpath(platform)
-    loaded   = bob.bob_loadLibBoblight(libpath,platform)
-  
-    if loaded == 1:                                #libboblight not found                                               
-      if platform == 'linux':
-        xbmcgui.Dialog().ok(__scriptname__, localize(32504) + " ".encode('utf-8') + localize(32505) + " ".encode('utf-8') + localize(32506))
-      
-      else:
-        # ask user if we should fetch the lib for osx, ios, android and windows
-        if xbmcgui.Dialog().yesno(__scriptname__, localize(32504) + " ".encode('utf-8') + localize(32509)):
-          tools_downloadLibBoblight(platform,settings.other_misc_notifications)
-          loaded = bob.bob_loadLibBoblight(libpath,platform)
-      
-        
-    elif loaded == 2:         #no ctypes available
-      xbmcgui.Dialog().ok(__scriptname__, localize(32507) + " ".encode('utf-8') + localize(32508))
-  
-    return loaded  
+
 
 def check_state(monitor):
   if xbmc.Player().isPlaying():
@@ -190,45 +173,43 @@ def run_boblight():
   xbmc_monitor   = MyMonitor()
   player_monitor = MyPlayer(xbmc_monitor)
   player_monitor.playing = xbmc.Player().isPlaying()
-  if main.startup() == 0:
-    while not xbmc_monitor.abortRequested():
-      xbmc_monitor.waitForAbort(0.1)
-      if not settings.bobdisable:
-        if not bob.bob_ping() or settings.reconnect:
-          if not main.connectBoblight():
-            continue
-          if settings.bob_init():
-            check_state(xbmc_monitor)
-          settings.reconnect = False
-          
-        if not settings.staticBobActive:
-          startReadOut = False
-          pixels = capture.getImage(1000)
-          if len(pixels) > 0 and player_monitor.isPlaying():
-            startReadOut = True
 
-          if startReadOut:
-            width = capture.getWidth();
-            height = capture.getHeight();
+  while not xbmc_monitor.abortRequested():
+    xbmc_monitor.waitForAbort(0.1)
+    if not settings.bobdisable:
+      if not bob.bob_ping() or settings.reconnect:
+        if not main.connectBoblight():
+          continue
+        if settings.bob_init():
+          check_state(xbmc_monitor)
+        settings.reconnect = False
+        
+      if not settings.staticBobActive:
+        startReadOut = False
+        pixels = capture.getImage(1000)
+        if len(pixels) > 0 and player_monitor.isPlaying():
+          startReadOut = True
 
-            bob.bob_setscanrange(width, height)
-            rgb = (c_int * 3)()
-            for y in range(height):
-              row = width * y * 4
-              for x in range(width):
-                rgb[0] = pixels[row + x * 4 + 2]
-                rgb[1] = pixels[row + x * 4 + 1]
-                rgb[2] = pixels[row + x * 4]
-                bob.bob_addpixelxy(x, y, byref(rgb))
+        if startReadOut:
+          width = capture.getWidth();
+          height = capture.getHeight();
 
-            bob.bob_set_priority(128)
-            if not bob.bob_sendrgb():
-              log("error sending values: %s" % bob.bob_geterror())
-              return   
+          bob.bob_setscanrange(width, height)
+          rgb = {}# (c_int * 3)()
+          for y in range(height):
+            row = width * y * 4
+            for x in range(width):
+              rgb[0] = pixels[row + x * 4 + 2]
+              rgb[1] = pixels[row + x * 4 + 1]
+              rgb[2] = pixels[row + x * 4]
+              bob.bob_addpixelxy(float(x), float(y), rgb)
+
+          bob.bob_set_priority(128)
+          if not bob.bob_sendrgb():
+            log("error sending values: %s" % bob.bob_geterror())
+            return   
                         
       else:
-        log('boblight disabled in Addon Settings')
-        bob.bob_set_priority(255)
         continue
 
   del main                  #cleanup
