@@ -19,6 +19,7 @@
 
 
 import socket
+import time
 from resources.lib.tools import *
 
 
@@ -87,6 +88,10 @@ class Boblight():
         return None
   
   def _sync(self):
+    if self.lastupdate > time.time()-0.1:
+        return
+    else:
+        self.lastupdate=time.time()
     self._send_command('sync')
 
   def _refresh_lights_info(self):
@@ -114,9 +119,9 @@ class Boblight():
     self.lights=tempdic 
 
   def _prepare_rgb_color(self,lightname,r,g,b):
-    fr=r/255.0
-    fg=g/255.0
-    fb=b/255.0
+    fr=round(r/255.0,6)
+    fg=round(g/255.0,6)
+    fb=round(b/255.0,6)
     self._send_command("set light %s rgb %s %s %s"%(lightname,fr,fg,fb))
 
   def _update(self):
